@@ -1,38 +1,215 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.pageContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  min-height: 100vh;
+  background-color: #0a192f;
+  color: #8892b0;
+  padding: 10px; /* 减少内边距以适应小屏幕 */
+  overflow-x: hidden;
 }
 
-.App-link {
-  color: #61dafb;
+.homePage, .adminPage {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh; /* 调整为 min-height 以适应内容长度变化 */
+  background-color: #0a192f;
+  color: #8892b0;
 }
 
-@keyframes App-logo-spin {
+.homeForm {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: #112240; /* 深藍色背景 */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: slideIn 0.5s ease-in-out; /* 新增滑入動畫 */
+}
+
+@keyframes slideIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.inputGroup {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.textInput {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px;
+  border: 1px solid #ccd6f6; /* 更亮的邊框顏色 */
+  border-radius: 4px;
+  width: 250px;
+  background-color: transparent; /* 透明背景 */
+  color: #ccd6f6; /* 輸入文字顏色 */
+}
+
+.submitButton {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #64ffda; /* 鮮亮的按鈕顏色增加活力 */
+  color: #0a192f; /* 按鈕文字顏色 */
+  cursor: pointer;
+  transition: background-color 0.3s; /* 平滑背景顏色過渡 */
+}
+
+.submitButton:hover {
+  background-color: #52de97; /* 按鈕懸停效果 */
+}
+
+/* 響應式設計：針對較小的螢幕進行調整 */
+@media (max-width: 600px) {
+  .textInput, .submitButton {
+    padding: 8px 15px; /* 调整填充以适应小屏幕 */
+    font-size: 0.9rem; /* 调整字体大小以提高可读性 */
+  }
+}
+.App {
+  min-height: 100vh; /* 確保 App 至少和視窗一樣高 */
+  display: flex;
+  flex-direction: column; /* 子元素垂直排列 */
+  align-items: center; /* 子元素水平居中 */
+  justify-content: flex-start; /* 從頂部開始排列子元素 */
+  background-color: #0a192f; /* 與 .homePage 保持一致的背景顏色 */
+  color: #8892b0; /* 主要文字顏色 */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 使用常見的無襯線字體 */
+  padding: 20px; /* 添加一些內邊距以避免內容貼近邊緣 */
+  overflow-x: hidden; /* 防止水平滾動 */
+}
+
+/* 調整路由元素的樣式 */
+.route-content {
+  width: 100%; /* 路由內容寬度 */
+  max-width: 800px; /* 最大寬度限制，適應大屏幕 */
+  margin: 20px 0; /* 添加上下外邊距 */
+  padding: 20px; /* 內邊距 */
+  background: #112240; /* 深藍色背景，與 .homeForm 保持一致 */
+  border-radius: 8px; /* 圓角 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 盒子陰影 */
+  animation: fadeIn 0.5s ease-in-out; /* 淡入動畫 */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 增強對小屏幕的支持 */
+@media (max-width: 600px) {
+  .route-content {
+    margin: 10px; /* 小屏幕上減少外邊距 */
+    padding: 10px; /* 小屏幕上減少內邊距 */
+  }
+}
+.main-content {
+  text-align: center; /* 置中文字 */
+  margin-top: 50px; /* 添加一些上邊距 */
+  width: 100%; /* 確保佔滿整個寬度 */
+  display: flex; /* 使用 flexbox */
+  flex-direction: column; /* 元素垂直排列 */
+  align-items: center; /* 水平居中 */
+  justify-content: center; /* 垂直居中 */
+  min-height: 60vh; /* 最小高度，確保主要內容有足夠的空間顯示 */
+  animation: fadeIn 1s ease-in-out; /* 添加淡入動畫 */
+}
+
+.main-content h1 {
+  font-size: 2.5rem; /* 放大文字 */
+  color: #ccd6f6; /* 設置文字顏色 */
+  margin-bottom: 20px; /* 添加一些下邊距，與按鈕保持距離 */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #64ffda;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.2s; /* 添加 transform 到過渡效果 */
+}
+
+button:hover {
+  background-color: #52de97;
+  transform: scale(1.05); /* 按鈕懸停時稍微放大 */
+}
+.link-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #64ffda; /* 鮮亮的按鈕背景色 */
+  color: #0a192f; /* 按鈕文字顏色 */
+  border: none;
+  border-radius: 5px;
+  text-decoration: none; /* 去除下划线 */
+  font-size: 1rem;
+  transition: background-color 0.3s, transform 0.2s; /* 平滑背景顏色和放大的過渡效果 */
+}
+
+.link-button:hover {
+  background-color: #52de97; /* 鼠标悬停时的背景色 */
+  transform: scale(1.05); /* 鼠标悬停时稍微放大 */
+  color: #ffffff; /* 鼠标悬停时的文字颜色 */
+}
+.meetingsList {
+  width: 100%;
+  max-width: 800px; /* 与页面其他内容保持一致的最大宽度 */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 使会议项目在列表中居中 */
+}
+
+.meetingItem {
+  width: 100%; /* 使会议项目宽度占满列表宽度 */
+  display: flex;
+  justify-content: space-around; /* 平均分布会议信息 */
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* 增加一些过渡效果，使界面更加平滑和友好 */
+.meetingItem span {
+  transition: color 0.3s;
+}
+
+.meetingItem:hover span {
+  color: #64ffda; /* 鼠标悬停时改变文字颜色 */
 }
