@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import HomePage from './HomePage';
 import AdminPage from './AdminPage';
+import MeetingDetails from './MeetingDetails';
 import './App.css';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           {/* 使用路由參數 :code 來捕獲會議室代碼 */}
           <Route path="/checkin/:code" element={<HomePage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/meeting-details/:meetingCode" element={<MeetingDetails />} />
         </Routes>
       </div>
     </Router>

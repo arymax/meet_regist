@@ -213,3 +213,99 @@ button:hover {
 .meetingItem:hover span {
   color: #64ffda; /* 鼠标悬停时改变文字颜色 */
 }
+.tableContainer {
+  width: 100%; /* 表格容器的寬度設為 100% */
+  max-width: none; /* 移除最大寬度限制 */
+  margin: 20px 0; /* 保持上下邊距 */
+  overflow-x: auto; /* 確保內容過寬時可以滾動 */
+}
+
+.tableContainer table {
+  width: 100%; /* 表格寬度設為 100% */
+  /* 其他樣式保持不變 */
+}
+
+.tableContainer th,
+.tableContainer td {
+  padding: 10px;
+  border: 1px solid #1cc9a0; /* 給表格添加邊框 */
+  text-align: left; /* 左對齊文本 */
+}
+
+.tableContainer th {
+  background-color: #112240; /* 表頭背景色 */
+  color: #1cc9a0; /* 表頭文本顏色 */
+}
+
+.tableContainer tr:nth-child(even) {
+  background-color: #020c1b; /* 表格條紋樣式 */
+}
+
+.tableContainer tr:hover {
+  background-color: #112240; /* 滑過行的背景色 */
+}
+
+/* 調整按鈕樣式以符合整體風格 */
+.fileInputContainer {
+  margin-top: 20px;
+}
+
+.fileInputContainer input[type="file"] {
+  padding: 8px;
+  background-color: #112240;
+  border: 1px solid #1cc9a0;
+  color: #8892b0;
+}
+
+.fileInputContainer button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  background-color: #1cc9a0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.fileInputContainer button:hover {
+  background-color: #52de97;
+  transform: scale(1.05);
+}
+
+/* 增加響應式設計 */
+@media (max-width: 768px) {
+  .tableContainer {
+    margin-top: 10px;
+  }
+
+  .tableContainer th,
+  .tableContainer td {
+    padding: 8px;
+  }
+}
+.meetingDetailsPageContainer {
+ display: flex;
+  flex-direction: column;
+  align-items: center; /* 如果希望容器內的子元素居中，可以保留 */
+  justify-content: flex-start; /* 如果希望內容從頂部開始，可以改為 flex-start */
+  min-height: 100vh;
+  background-color: #0a192f;
+  color: #8892b0;
+  padding: 10px;
+  overflow-x: hidden;
+  width: 100%; /* 設置容器寬度為 100% */
+}
+
+/* 专门为会议详细信息页面设计的表格容器，允许它更宽 */
+.meetingDetailsTableContainer {
+  width: calc(100% - 2rem); /* 计算宽度，2rem 是左右的 padding 总和 */
+  max-width: 1200px; /* 或者任何您希望的最大宽度，也可以不设置这个属性 */
+  margin: 20px;
+  overflow-x: auto; /* 当表格内容太宽时，允许横向滚动 */
+}
+
+.meetingDetailsTableContainer table {
+  width: 100%; /* 让表格宽度等于其容器的宽度 */
+  /* 其他样式保持不变 */
+}

@@ -1,17 +1,19 @@
 const express = require('express');
-const multer = require('multer');
+const busboy = require('connect-busboy');
+const fs = require('fs');
 const XLSX = require('xlsx');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const os = require('os');
 const moment = require('moment-timezone');
 const app = express();
-const upload = multer({ dest: 'uploads/' });
+const path = require('path');
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-
+app.use(busboy());
 // 獲取本機 IP 地址
 function getLocalIPAddress() {
     const networkInterfaces = os.networkInterfaces();
@@ -28,19 +30,21 @@ function getLocalIPAddress() {
 const localIP = getLocalIPAddress();
 console.log(`Local IP Address: ${localIP}`);
 
+
 const db = new sqlite3.Database('./mydb.sqlite', (err) => {
     if (err) {
         console.error('Error opening database', err.message);
     } else {
         console.log('Connected to the SQLite database.');
-        // 創建會議表
+        // 創建會議表，並直接加入excelPath欄位
         db.run(`
             CREATE TABLE IF NOT EXISTS meetings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 startTime TEXT,
                 endTime TEXT,
                 meetingCode TEXT UNIQUE,
-                meetingLink TEXT
+                meetingLink TEXT,
+                excelPath TEXT
             )
         `, (err) => {
             if (err) {
@@ -64,22 +68,7 @@ const db = new sqlite3.Database('./mydb.sqlite', (err) => {
     }
 });
 
-app.get('/api-list/checkin/:code', (req, res) => {
-    const { code } = req.params;
-    const sql = 'SELECT * FROM meetings WHERE meetingCode = ?';
-    db.get(sql, [code], (err, row) => {
-        if (err) {
-            console.error('Error querying the table', err.message);
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        if (row) {
-            res.json({ message: '會議代碼有效', code: row.meetingCode });
-        } else {
-            res.status(404).json({ message: '會議代碼無效' });
-        }
-    });
-});
+
 // 處理會議資訊提交
 app.post('/api-list/meeting-regist', (req, res) => {
     console.log('Received meeting-regist request');
@@ -109,6 +98,23 @@ app.get('/api-list/meetings', (req, res) => {
         }
         res.setHeader('Content-Type', 'application/json');
         res.json(rows);
+    });
+});
+app.get('/api-list/meetings/:meetingCode', (req, res) => {
+    const { meetingCode } = req.params; // 從 URL 參數中獲取 meetingCode
+
+    const sql = 'SELECT * FROM meetings WHERE meetingCode = ?';
+    db.get(sql, [meetingCode], (err, row) => {
+        if (err) {
+            console.error('Error querying the meetings table', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json(row); // 如果找到了會議，返回會議資訊
+        } else {
+            res.status(404).json({ message: '會議代碼未找到' }); // 如果未找到會議，返回 404 錯誤
+        }
     });
 });
 app.post('/api-list/checkin', (req, res) => {
@@ -148,15 +154,42 @@ app.post('/api-list/checkin', (req, res) => {
         }
     });
 });
+app.get('/api-list/checkin/:code', (req, res) => {
+    const { code } = req.params;
+    const sql = 'SELECT * FROM meetings WHERE meetingCode = ?';
+    db.get(sql, [code], (err, row) => {
+        if (err) {
+            console.error('Error querying the table', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.json({ message: '會議代碼有效', code: row.meetingCode });
+        } else {
+            res.status(404).json({ message: '會議代碼無效' });
+        }
+    });
+});
 // 處理 Excel 檔案上傳
-app.post('/api-list/upload', upload.single('file'), (req, res) => {
-    const file = req.file;
-    const workbook = XLSX.readFile(file.path);
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(worksheet);
-    console.log(data);
-    res.json({ message: '檔案處理成功', data });
+app.post('/api-list/upload', (req, res) => {
+    req.busboy.on('file', (fieldname, file, fileObj) => {
+        console.log(`Uploading: ${fileObj.filename}`);
+
+        if (typeof fileObj.filename === 'string') {
+            const saveTo = path.join(__dirname, './attender_list/', fileObj.filename);
+            file.pipe(fs.createWriteStream(saveTo));
+        } else {
+            console.error('Filename is not a string:', fileObj.filename);
+        }
+    });
+
+    req.busboy.on('finish', () => {
+        console.log('Upload complete');
+        // 修改這裡，將響應改為 JSON 格式
+        res.json({ message: "File uploaded successfully" });
+    });
+
+    req.pipe(req.busboy);
 });
 app.get('/api-list/checkins/:meetingCode', (req, res) => {
     const { meetingCode } = req.params;
@@ -171,6 +204,30 @@ app.get('/api-list/checkins/:meetingCode', (req, res) => {
         }
         res.json(rows);
     });
+});
+app.get('/api-list/attendees/:meetingCode', (req, res) => {
+    const { meetingCode } = req.params;
+    // 根據會議代碼構建 Excel 文件的路徑
+    const excelPath = path.join(__dirname, './attender_list/', `${meetingCode}.xlsx`);
+
+    // 檢查文件是否存在
+    if (!fs.existsSync(excelPath)) {
+        return res.status(404).json({ message: 'Excel file for this meeting code does not exist.' });
+    }
+
+    try {
+        // 讀取 Excel 文件
+        const workbook = XLSX.readFile(excelPath);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const attendees = XLSX.utils.sheet_to_json(worksheet);
+
+        // 將 Excel 文件中的參與者信息發送到前端
+        res.json(attendees);
+    } catch (error) {
+        console.error('Error reading the excel file', error);
+        res.status(500).json({ error: 'Failed to read the attendees list from the Excel file.' });
+    }
 });
 setInterval(() => {
     // 获取当前时间
